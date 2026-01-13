@@ -3,12 +3,10 @@ import {
   Category,
   CategoryLeaderboardResponse,
   ModelInfo,
-  BenchmarkListItem,
   ModelListItem,
 } from "../types";
 
 const BASE_URL = "https://api.zeroeval.com";
-const LOGO_BASE_URL = "https://llm-stats.com/logos";
 
 export class ZeroEvalAPI {
   /**
@@ -73,14 +71,6 @@ export class ZeroEvalAPI {
   }
 
   /**
-   * Gets the list of all benchmarks
-   */
-  async getBenchmarks(): Promise<BenchmarkListItem[]> {
-    const endpoint = "/leaderboard/benchmarks";
-    return this.fetch<BenchmarkListItem[]>(endpoint);
-  }
-
-  /**
    * Gets detailed information about a specific model
    * @param modelId - The model ID
    */
@@ -100,13 +90,5 @@ export class ZeroEvalAPI {
   ): Promise<ModelListItem[]> {
     const endpoint = `/leaderboard/models/full?justCanonicals=${justCanonicals}&include_benchmarks=${includeBenchmarks}`;
     return this.fetch<ModelListItem[]>(endpoint);
-  }
-
-  /**
-   * Generates the URL for an organization's logo
-   * @param organizationId - The organization ID
-   */
-  getOrganizationLogoUrl(organizationId: string): string {
-    return `${LOGO_BASE_URL}/${organizationId}.svg`;
   }
 }

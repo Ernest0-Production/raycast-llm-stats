@@ -32,27 +32,3 @@ export function findModelById(models: ModelListItem[] | undefined, modelId: stri
   return models.find((model) => model.model_id === modelId);
 }
 
-/**
- * Helper function to find a model by name
- * @param models - Array of models
- * @param modelName - The model name to find
- * @returns The model if found, undefined otherwise
- */
-export function findModelByName(models: ModelListItem[] | undefined, modelName: string): ModelListItem | undefined {
-  if (!models) return undefined;
-  return models.find((model) => model.name === modelName);
-}
-
-/**
- * Helper function to find models by organization
- * @param models - Array of models
- * @param organizationId - The organization ID to filter by
- * @returns Array of models from the organization
- */
-export function findModelsByOrganization(
-  models: ModelListItem[] | undefined,
-  organizationId: string
-): ModelListItem[] {
-  if (!models) return [];
-  return models.filter((model) => model.organization_id === organizationId);
-}

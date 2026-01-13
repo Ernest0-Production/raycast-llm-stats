@@ -65,17 +65,6 @@ export interface Benchmark {
   top_models: BenchmarkModel[];
 }
 
-export interface BenchmarkListItem {
-  benchmark_id: string;
-  name: string;
-  description: string;
-  categories: string[];
-  modality: string;
-  max_score: number;
-  verified: boolean;
-  model_count: number;
-}
-
 export interface CategoryLeaderboardResponse {
   category: Category;
   benchmarks: Benchmark[];
