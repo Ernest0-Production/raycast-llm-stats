@@ -13,10 +13,7 @@ export interface Arena {
  * Static hashmap of arenas grouped by sections
  */
 export const ARENAS_BY_SECTION = new Map<string, Arena[]>([
-  [
-    "Chat Arena",
-    [{ id: "chat-arena", name: "Chat Arena", icon: Icon.Message }],
-  ],
+  ["Chat Arena", [{ id: "chat-arena", name: "Chat Arena", icon: Icon.Message }]],
   [
     "Coding Arena",
     [
@@ -51,10 +48,7 @@ export const ARENAS_BY_SECTION = new Map<string, Arena[]>([
       { id: "music", name: "Text to Music", icon: Icon.Music },
     ],
   ],
-  [
-    "Trading Arena",
-    [{ id: "stock-arena", name: "Stocks Arena", icon: Icon.LineChart }],
-  ],
+  ["Trading Arena", [{ id: "stock-arena", name: "Stocks Arena", icon: Icon.LineChart }]],
 ]);
 
 /**

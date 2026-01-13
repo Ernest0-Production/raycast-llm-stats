@@ -1,10 +1,4 @@
-import {
-  ArenaLeaderboardResponse,
-  Category,
-  CategoryLeaderboardResponse,
-  ModelInfo,
-  ModelListItem,
-} from "../types";
+import { ArenaLeaderboardResponse, Category, CategoryLeaderboardResponse, ModelInfo, ModelListItem } from "../types";
 
 const BASE_URL = "https://api.zeroeval.com";
 
@@ -38,7 +32,7 @@ export class ZeroEvalAPI {
   async getArenaLeaderboard(
     arenaId: string,
     limit: number = 10,
-    offset: number = 0
+    offset: number = 0,
   ): Promise<ArenaLeaderboardResponse> {
     let endpoint: string;
     if (arenaId === "stock-arena") {
@@ -62,10 +56,7 @@ export class ZeroEvalAPI {
    * @param categoryId - The category ID
    * @param topN - Number of top models to return per benchmark (default: 15)
    */
-  async getCategoryBenchmarks(
-    categoryId: string,
-    topN: number = 15
-  ): Promise<CategoryLeaderboardResponse> {
+  async getCategoryBenchmarks(categoryId: string, topN: number = 15): Promise<CategoryLeaderboardResponse> {
     const endpoint = `/leaderboard/categories/${categoryId}/benchmarks?top_n=${topN}`;
     return this.fetch<CategoryLeaderboardResponse>(endpoint);
   }
@@ -84,10 +75,7 @@ export class ZeroEvalAPI {
    * @param justCanonicals - Return only canonical models (default: true)
    * @param includeBenchmarks - Include benchmark data (default: true)
    */
-  async getModels(
-    justCanonicals: boolean = true,
-    includeBenchmarks: boolean = true
-  ): Promise<ModelListItem[]> {
+  async getModels(justCanonicals: boolean = true, includeBenchmarks: boolean = true): Promise<ModelListItem[]> {
     const endpoint = `/leaderboard/models/full?justCanonicals=${justCanonicals}&include_benchmarks=${includeBenchmarks}`;
     return this.fetch<ModelListItem[]>(endpoint);
   }

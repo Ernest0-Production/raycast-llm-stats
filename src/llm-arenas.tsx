@@ -10,12 +10,20 @@ import { ARENAS_BY_SECTION } from "./utils/arenas";
 const api = new ZeroEvalAPI();
 
 export default function Command() {
-  const [selectedArena, setSelectedArena] = useCachedState<string>("selected-arena", ARENAS_BY_SECTION.get("Chat Arena")?.[0].id || "");
+  const [selectedArena, setSelectedArena] = useCachedState<string>(
+    "selected-arena",
+    ARENAS_BY_SECTION.get("Chat Arena")?.[0].id || "",
+  );
 
   // Load and cache all models
   const { data: allModels, isLoading: isLoadingModels } = useModels(true, true);
 
-  const { data: leaderboardData, isLoading: isLoadingLeaderboard, error, revalidate } = useCachedPromise(
+  const {
+    data: leaderboardData,
+    isLoading: isLoadingLeaderboard,
+    error,
+    revalidate,
+  } = useCachedPromise(
     async (arenaId: string) => {
       return api.getArenaLeaderboard(arenaId, 50, 0);
     },
@@ -28,7 +36,7 @@ export default function Command() {
           message: error instanceof Error ? error.message : "Unknown error",
         });
       },
-    }
+    },
   );
 
   const handleArenaChange = (newArenaId: string) => {
@@ -56,20 +64,11 @@ export default function Command() {
       isLoading={isLoading}
       searchBarPlaceholder="Search models..."
       searchBarAccessory={
-        <List.Dropdown
-          tooltip="Select Arena"
-          value={selectedArena}
-          onChange={handleArenaChange}
-        >
+        <List.Dropdown tooltip="Select Arena" value={selectedArena} onChange={handleArenaChange}>
           {Array.from(ARENAS_BY_SECTION.entries()).map(([sectionName, section]) => (
             <List.Dropdown.Section key={sectionName} title={sectionName}>
               {section.map((arena) => (
-                <List.Dropdown.Item
-                  key={arena.id}
-                  title={arena.name}
-                  value={arena.id}
-                  icon={arena.icon}
-                />
+                <List.Dropdown.Item key={arena.id} title={arena.name} value={arena.id} icon={arena.icon} />
               ))}
             </List.Dropdown.Section>
           ))}
@@ -122,9 +121,10 @@ function createScoreAccessory(model: ArenaModel, index: number): List.Item.Acces
   if (index < 3) {
     return {
       tag: {
-        value: model.percent_gain !== undefined
-          ? `${model.percent_gain! >= 0 ? "+" : ""}${model.percent_gain!.toFixed(2)}%`
-          : `${model.conservative_rating?.toFixed(2) || "-"}`,
+        value:
+          model.percent_gain !== undefined
+            ? `${model.percent_gain! >= 0 ? "+" : ""}${model.percent_gain!.toFixed(2)}%`
+            : `${model.conservative_rating?.toFixed(2) || "-"}`,
         color: trophyColors[index],
       },
       icon: Icon.Trophy,

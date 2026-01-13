@@ -9,15 +9,12 @@ const api = new ZeroEvalAPI();
  * @param justCanonicals - Return only canonical models (default: true)
  * @param includeBenchmarks - Include benchmark data (default: true)
  */
-export function useModels(
-  justCanonicals: boolean = true,
-  includeBenchmarks: boolean = true
-) {
+export function useModels(justCanonicals: boolean = true, includeBenchmarks: boolean = true) {
   return useCachedPromise(
     async (justCanonicals: boolean, includeBenchmarks: boolean) => {
       return api.getModels(justCanonicals, includeBenchmarks);
     },
-    [justCanonicals, includeBenchmarks]
+    [justCanonicals, includeBenchmarks],
   );
 }
 
@@ -31,4 +28,3 @@ export function findModelById(models: ModelListItem[] | undefined, modelId: stri
   if (!models) return undefined;
   return models.find((model) => model.model_id === modelId);
 }
-

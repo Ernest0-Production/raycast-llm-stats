@@ -1,10 +1,4 @@
-import {
-  Icon,
-  List,
-  showToast,
-  Toast,
-  Color,
-} from "@raycast/api";
+import { Icon, List, showToast, Toast, Color } from "@raycast/api";
 import { useCachedPromise, useCachedState } from "@raycast/utils";
 import { useEffect } from "react";
 import { ZeroEvalAPI } from "./utils/zeroeval-api";
@@ -16,10 +10,7 @@ import { getCategoryIcon } from "./utils/category-icons";
 const api = new ZeroEvalAPI();
 
 export default function Command() {
-  const [selectedCategoryId, setSelectedCategoryId] = useCachedState<string>(
-    "selected-category-id",
-    "general"
-  );
+  const [selectedCategoryId, setSelectedCategoryId] = useCachedState<string>("selected-category-id", "general");
 
   // Load and cache all models
   const { data: allModels, isLoading: isLoadingModels } = useModels(true, true);
@@ -69,7 +60,7 @@ export default function Command() {
           message: error instanceof Error ? error.message : "Unknown error",
         });
       },
-    }
+    },
   );
 
   // Auto-select first category if none selected and categories are loaded
@@ -134,33 +125,26 @@ export default function Command() {
         />
       ) : (
         categoryData?.benchmarks.map((benchmark) => (
-          <List.Section
-            key={benchmark.benchmark_id}
-            title={benchmark.name}
-          >
+          <List.Section key={benchmark.benchmark_id} title={benchmark.name}>
             {benchmark.top_models.slice(0, 5).map((model, index) => {
               // Find model in cached list to get additional info
               const cachedModel = findModelById(allModels, model.model_id);
 
               // Add Trophy icon to first element in each section
               const accessories: List.Item.Accessory[] = [
-                index === 0 ? {
-                  tag: {
-                    value: formatBenchmarkScore(
-                      model.benchmark_score,
-                      benchmark.max_score
-                    ),
-                    color: Color.Yellow,
-                  },
-                  icon: Icon.Trophy,
-                  tooltip: benchmark.description || benchmark.name,
-                } : {
-                  text: formatBenchmarkScore(
-                    model.benchmark_score,
-                    benchmark.max_score
-                  ),
-                  tooltip: benchmark.description || benchmark.name,
-                },
+                index === 0
+                  ? {
+                      tag: {
+                        value: formatBenchmarkScore(model.benchmark_score, benchmark.max_score),
+                        color: Color.Yellow,
+                      },
+                      icon: Icon.Trophy,
+                      tooltip: benchmark.description || benchmark.name,
+                    }
+                  : {
+                      text: formatBenchmarkScore(model.benchmark_score, benchmark.max_score),
+                      tooltip: benchmark.description || benchmark.name,
+                    },
               ];
 
               return (
@@ -169,14 +153,9 @@ export default function Command() {
                   icon={getOrganizationLogo(cachedModel?.organization_id || model.organization_name.toLowerCase())}
                   title={cachedModel?.name || model.model_name}
                   subtitle={cachedModel?.organization || model.organization_name}
-                  keywords={[
-                    cachedModel?.organization || model.organization_name,
-                    benchmark.name
-                  ]}
+                  keywords={[cachedModel?.organization || model.organization_name, benchmark.name]}
                   accessories={accessories}
-                  actions={
-                    <ModelActions modelId={model.model_id} modelName={cachedModel?.name || model.model_name} />
-                  }
+                  actions={<ModelActions modelId={model.model_id} modelName={cachedModel?.name || model.model_name} />}
                 />
               );
             })}
