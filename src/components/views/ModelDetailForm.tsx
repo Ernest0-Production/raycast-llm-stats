@@ -3,6 +3,7 @@ import { useCachedPromise } from "@raycast/utils";
 import { ZeroEvalAPI } from "../../utils/zeroeval-api";
 import { ORGANIZATION_LOGOS } from "../../utils/organization-logos";
 import { ModelDetailsLinkAction } from "../actions/ModelDetailsLinkAction";
+import { formatParamCount, formatContextSize, formatPrice } from "../../utils/formatting";
 
 interface ModelDetailFormProps {
   modelId: string;
@@ -35,32 +36,11 @@ export function ModelDetailForm({ modelId }: ModelDetailFormProps) {
     );
   }
 
-  // Get pricing and context info from first provider
-  const primaryProvider = modelInfo?.providers?.[0];
-  const inputPrice = primaryProvider?.pricing?.input_per_million;
-  const outputPrice = primaryProvider?.pricing?.output_per_million;
-  const contextSize = primaryProvider?.limits?.max_input_tokens;
-  const throughput = primaryProvider?.performance?.throughput;
-  const latency = primaryProvider?.performance?.latency;
-  const modalities = primaryProvider?.modalities;
-  const quantization = primaryProvider?.quantization;
-
   // Build markdown content
   const markdownParts: string[] = [];
 
   if (modelInfo?.name) {
-    // Get organization logo URL
-    const organizationId = modelInfo.organization?.id;
-    const logoUrl = organizationId && typeof ORGANIZATION_LOGOS[organizationId] === 'string'
-      ? ORGANIZATION_LOGOS[organizationId] as string
-      : null;
-
-    // Build header with logo if available
-    const headerContent = logoUrl
-      ? `<img src="${logoUrl}" alt="${modelInfo.organization?.name || ''}" width="24" height="24" style="vertical-align: middle;" /> ${modelInfo.name}`
-      : modelInfo.name;
-
-    markdownParts.push(`# ${headerContent}`);
+    markdownParts.push(`# ${(modelInfo.organization?.id && typeof ORGANIZATION_LOGOS[modelInfo.organization.id] === 'string' ? ORGANIZATION_LOGOS[modelInfo.organization.id] as string : null) ? `<img src="${ORGANIZATION_LOGOS[modelInfo.organization.id] as string}" alt="${modelInfo.organization?.name || ''}" width="24" height="24" style="vertical-align: middle;" /> ${modelInfo.name}` : modelInfo.name}`);
   }
 
   if (modelInfo?.description) {
@@ -87,12 +67,10 @@ export function ModelDetailForm({ modelId }: ModelDetailFormProps) {
     markdownParts.push(tableRows.join("\n"));
   }
 
-  const markdown = markdownParts.length > 0 ? markdownParts.join("\n\n") : "";
-
   return (
     <Detail
       isLoading={isLoading}
-      markdown={markdown}
+      markdown={markdownParts.length > 0 ? markdownParts.join("\n\n") : ""}
       actions={
         <ActionPanel>
           <ModelDetailsLinkAction modelId={modelId} />
@@ -102,52 +80,52 @@ export function ModelDetailForm({ modelId }: ModelDetailFormProps) {
         modelInfo && (
           <Detail.Metadata>
             {/* Context Window, Parameters, Latency Section */}
-            {(contextSize !== null) && (
+            {(modelInfo?.providers?.[0]?.limits?.max_input_tokens) && (
               <>
-                <Detail.Metadata.Label title="Context Window" text={formatContextSize(contextSize ?? 0)} />
+                <Detail.Metadata.Label title="Context Window" text={formatContextSize(modelInfo.providers[0].limits.max_input_tokens ?? 0)} />
                 {modelInfo.param_count !== null && (
                   <Detail.Metadata.Label title="Parameters" text={formatParamCount(modelInfo.param_count)} icon={Icon.Calculator} />
                 )}
-                {quantization !== null && (
-                  <Detail.Metadata.Label title="Quantization" text={quantization} icon={Icon.ArrowsContract} />
+                {modelInfo?.providers?.[0]?.quantization !== null && (
+                  <Detail.Metadata.Label title="Quantization" text={modelInfo.providers[0].quantization} icon={Icon.ArrowsContract} />
                 )}
-                {throughput !== null && (
-                  <Detail.Metadata.Label title="Throughput" text={`${throughput} tokens/second`} icon={Icon.Bolt} />
+                {modelInfo?.providers?.[0]?.performance?.throughput !== null && (
+                  <Detail.Metadata.Label title="Throughput" text={`${modelInfo.providers[0].performance.throughput} tokens/second`} icon={Icon.Bolt} />
                 )}
-                {latency !== null && (
-                  <Detail.Metadata.Label title="Latency" text={latency} icon={Icon.Signal2} />
+                {modelInfo?.providers?.[0]?.performance?.latency !== null && (
+                  <Detail.Metadata.Label title="Latency" text={modelInfo.providers[0].performance.latency} icon={Icon.Signal2} />
                 )}
                 <Detail.Metadata.Separator />
               </>
             )}
 
             {/* Pricing Section */}
-            {inputPrice && (
-              <Detail.Metadata.Label title="Input Price" text={formatPrice(inputPrice)} />
+            {modelInfo?.providers?.[0]?.pricing?.input_per_million && (
+              <Detail.Metadata.Label title="Input Price" text={formatPrice(modelInfo.providers[0].pricing.input_per_million)} />
             )}
-            {outputPrice && (
-              <Detail.Metadata.Label title="Output Price" text={formatPrice(outputPrice)} />
+            {modelInfo?.providers?.[0]?.pricing?.output_per_million && (
+              <Detail.Metadata.Label title="Output Price" text={formatPrice(modelInfo.providers[0].pricing.output_per_million)} />
             )}
             {modelInfo.license && (
               <Detail.Metadata.Label title="License" text={modelInfo.license.name} icon={Icon.Shield} />
             )}
 
             {/* Modalities Section */}
-            {modalities && (
+            {modelInfo?.providers?.[0]?.modalities && (
               <>
                 <Detail.Metadata.Separator />
                 {(() => {
                   const inputModalities: Detail.Metadata.TagList.Item.Props[] = [];
-                  if (modalities.input.text) inputModalities.push({ text: "Text", icon: Icon.Text });
-                  if (modalities.input.image) inputModalities.push({ text: "Image", icon: Icon.Image });
-                  if (modalities.input.audio) inputModalities.push({ text: "Audio", icon: Icon.Headphones });
-                  if (modalities.input.video) inputModalities.push({ text: "Video", icon: Icon.Video });
+                  if (modelInfo.providers[0].modalities.input.text) inputModalities.push({ text: "Text", icon: Icon.Text });
+                  if (modelInfo.providers[0].modalities.input.image) inputModalities.push({ text: "Image", icon: Icon.Image });
+                  if (modelInfo.providers[0].modalities.input.audio) inputModalities.push({ text: "Audio", icon: Icon.Headphones });
+                  if (modelInfo.providers[0].modalities.input.video) inputModalities.push({ text: "Video", icon: Icon.Video });
 
                   const outputModalities = [];
-                  if (modalities.output.text) outputModalities.push({ text: "Text", icon: Icon.Text });
-                  if (modalities.output.image) outputModalities.push({ text: "Image", icon: Icon.Image });
-                  if (modalities.output.audio) outputModalities.push({ text: "Audio", icon: Icon.Headphones });
-                  if (modalities.output.video) outputModalities.push({ text: "Video", icon: Icon.Video });
+                  if (modelInfo.providers[0].modalities.output.text) outputModalities.push({ text: "Text", icon: Icon.Text });
+                  if (modelInfo.providers[0].modalities.output.image) outputModalities.push({ text: "Image", icon: Icon.Image });
+                  if (modelInfo.providers[0].modalities.output.audio) outputModalities.push({ text: "Audio", icon: Icon.Headphones });
+                  if (modelInfo.providers[0].modalities.output.video) outputModalities.push({ text: "Video", icon: Icon.Video });
 
                   return (
                     <>
@@ -264,33 +242,6 @@ export function ModelDetailForm({ modelId }: ModelDetailFormProps) {
       }
     />
   );
-}
-
-function formatParamCount(count: number): string {
-  if (count >= 1_000_000_000) {
-    return `${(count / 1_000_000_000).toFixed(1)}B`;
-  }
-  if (count >= 1_000_000) {
-    return `${(count / 1_000_000).toFixed(1)}M`;
-  }
-  if (count >= 1_000) {
-    return `${(count / 1_000).toFixed(1)}K`;
-  }
-  return count.toString();
-}
-
-function formatPrice(pricePerMillion: number): string {
-  return `$${pricePerMillion.toFixed(2)}/1M tokens`;
-}
-
-function formatContextSize(tokens: number): string {
-  if (tokens >= 1_000_000) {
-    return `${(tokens / 1_000_000).toFixed(1)}M tokens`;
-  }
-  if (tokens >= 1_000) {
-    return `${(tokens / 1_000).toFixed(1)}K tokens`;
-  }
-  return `${tokens} tokens`;
 }
 
 function getHostnameFromUrl(url: string): string {

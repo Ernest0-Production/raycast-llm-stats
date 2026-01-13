@@ -1,63 +1,11 @@
-import { ActionPanel, Action, Icon, List, showToast, Toast, Color } from "@raycast/api";
+import { Icon, List, showToast, Toast, Color } from "@raycast/api";
 import { useCachedPromise, useCachedState } from "@raycast/utils";
 import { ZeroEvalAPI } from "./utils/zeroeval-api";
 import { ArenaModel } from "./types";
-import { ModelDetailForm } from "./components/views/ModelDetailForm";
 import { getOrganizationLogo } from "./utils/organization-logos";
 import { useModels, findModelById } from "./utils/use-models";
-import { ModelDetailsLinkAction } from "./components/actions/ModelDetailsLinkAction";
-
-interface Arena {
-  id: string;
-  name: string;
-  icon: Icon;
-}
-
-// Static hashmap of arenas grouped by sections
-const ARENAS_BY_SECTION = new Map<string, Arena[]>([
-  [
-    "Chat Arena",
-    [{ id: "chat-arena", name: "Chat Arena", icon: Icon.Message }],
-  ],
-  [
-    "Coding Arena",
-    [
-      { id: "text-to-website", name: "Website", icon: Icon.Globe },
-      { id: "threejs", name: "3D", icon: Icon.Box },
-      { id: "text-to-game", name: "Game", icon: Icon.GameController },
-      { id: "p5-animation", name: "Animation", icon: Icon.Brush },
-      { id: "text-to-svg", name: "Text to SVG", icon: Icon.Code },
-      { id: "dataviz", name: "Data Visualization", icon: Icon.BarChart },
-      { id: "tonejs", name: "MIDI", icon: Icon.Livestream },
-    ],
-  ],
-  [
-    "Image Arena",
-    [
-      { id: "text-to-image", name: "Text to Image", icon: Icon.Wand },
-      { id: "image-to-image", name: "Image to Image", icon: Icon.Image },
-    ],
-  ],
-  [
-    "Video Arena",
-    [
-      { id: "text-to-video", name: "Text to Image", icon: Icon.Wand },
-      { id: "image-to-video", name: "Image to Video", icon: Icon.Image },
-      { id: "video-editing", name: "Video Editing", icon: Icon.FilmStrip },
-    ],
-  ],
-  [
-    "Audio Arena",
-    [
-      { id: "text-to-speech", name: "Text to Speech", icon: Icon.SpeakerHigh },
-      { id: "music", name: "Text to Music", icon: Icon.Music },
-    ],
-  ],
-  [
-    "Trading Arena",
-    [{ id: "stock-arena", name: "Stocks Arena", icon: Icon.LineChart }],
-  ],
-]);
+import { ModelActions } from "./components/actions/ModelActions";
+import { ARENAS_BY_SECTION } from "./utils/arenas";
 
 const api = new ZeroEvalAPI();
 
@@ -136,124 +84,69 @@ export default function Command() {
         />
       ) : (
         models.map((model: ArenaModel, index) => {
-          // Find model in cached list to get additional info
           const cachedModel = findModelById(allModels, model.model_id);
-          const organizationId = cachedModel?.organization_id || model.organization.toLowerCase();
-          const modelName = cachedModel?.name || model.model_name;
-
-          const votesAccessory: List.Item.Accessory = {
-            text: `${model.wins}`,
-            icon: Icon.ThumbsUp,
-            tooltip: `Votes`,
-          };
-
-          let accessory: List.Item.Accessory;
-
-          if (model.percent_gain !== undefined) {
-            const value = `${model.percent_gain >= 0 ? "+" : ""}${model.percent_gain.toFixed(2)}%`;
-            if (index === 0) {
-              accessory = {
-                tag: {
-                  value,
-                  color: Color.Yellow,
-                },
-                icon: Icon.Trophy,
-                tooltip: `Percent Gain`,
-              };
-            } else if (index === 1) {
-              accessory = {
-                tag: {
-                  value,
-                  color: Color.SecondaryText,
-                },
-                icon: Icon.Trophy,
-                tooltip: `Percent Gain`,
-              };
-            } else if (index === 2) {
-              accessory = {
-                tag: {
-                  value,
-                  color: Color.Orange,
-                },
-                icon: Icon.Trophy,
-                tooltip: `Percent Gain`,
-              };
-            } else {
-              accessory = {
-                text: {
-                  value,
-                  color: model.percent_gain >= 0 ? Color.Green : Color.Red
-                },
-                tooltip: `Percent Gain`,
-              };
-            }
-          } else {
-            const value = `${model.conservative_rating?.toFixed(2) || "-"}`;
-            if (index === 0) {
-              accessory = {
-                tag: {
-                  value,
-                  color: Color.Yellow,
-                },
-                icon: Icon.Trophy,
-                tooltip: `Score`,
-              };
-            } else if (index === 1) {
-              accessory = {
-                tag: {
-                  value,
-                  color: Color.PrimaryText,
-                },
-                icon: Icon.Trophy,
-                tooltip: `Score`,
-              };
-            } else if (index === 2) {
-              accessory = {
-                tag: {
-                  value,
-                  color: Color.Orange,
-                },
-                icon: Icon.Trophy,
-                tooltip: `Score`,
-              };
-            } else {
-              accessory = {
-                tag: {
-                  value,
-                  color: Color.SecondaryText
-                },
-                tooltip: `Score`,
-              };
-            }
-          }
 
           return (
             <List.Item
               key={model.variant_id}
-              icon={getOrganizationLogo(organizationId)}
-              title={modelName}
+              icon={getOrganizationLogo(cachedModel?.organization_id || model.organization.toLowerCase())}
+              title={cachedModel?.name || model.model_name}
               subtitle={cachedModel?.organization || model.organization}
               keywords={[cachedModel?.organization || model.organization]}
-              accessories={[votesAccessory, accessory]}
-              actions={
-                <ActionPanel>
-                  <Action.Push
-                    title="Show Details"
-                    target={<ModelDetailForm modelId={model.model_id} />}
-                    icon={Icon.Info}
-                  />
-                  <ModelDetailsLinkAction modelId={model.model_id} />
-                  <Action.CopyToClipboard
-                    title="Copy Model Name"
-                    content={modelName}
-                    shortcut={{ modifiers: ["cmd"], key: "c" }}
-                  />
-                </ActionPanel>
-              }
+              accessories={[
+                {
+                  text: `${model.wins}`,
+                  icon: Icon.ThumbsUp,
+                  tooltip: "Votes",
+                },
+                createScoreAccessory(model, index),
+              ]}
+              actions={<ModelActions modelId={model.model_id} modelName={cachedModel?.name || model.model_name} />}
             />
           );
         })
       )}
     </List>
   );
+}
+
+/**
+ * Creates an accessory for score or percent gain display
+ * @param model - The arena model
+ * @param index - The model's position in the leaderboard
+ * @returns List.Item.Accessory for the score/percent gain
+ */
+function createScoreAccessory(model: ArenaModel, index: number): List.Item.Accessory {
+  const trophyColors = [Color.Yellow, Color.PrimaryText, Color.Orange];
+
+  if (index < 3) {
+    return {
+      tag: {
+        value: model.percent_gain !== undefined
+          ? `${model.percent_gain! >= 0 ? "+" : ""}${model.percent_gain!.toFixed(2)}%`
+          : `${model.conservative_rating?.toFixed(2) || "-"}`,
+        color: trophyColors[index],
+      },
+      icon: Icon.Trophy,
+      tooltip: model.percent_gain !== undefined ? "Percent Gain" : "Score",
+    };
+  }
+
+  if (model.percent_gain !== undefined) {
+    return {
+      text: {
+        value: `${model.percent_gain! >= 0 ? "+" : ""}${model.percent_gain!.toFixed(2)}%`,
+        color: model.percent_gain! >= 0 ? Color.Green : Color.Red,
+      },
+      tooltip: "Percent Gain",
+    };
+  }
+
+  return {
+    tag: {
+      value: `${model.conservative_rating?.toFixed(2) || "-"}`,
+      color: Color.SecondaryText,
+    },
+    tooltip: "Score",
+  };
 }

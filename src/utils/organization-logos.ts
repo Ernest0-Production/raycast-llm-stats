@@ -12,8 +12,7 @@ const LOBE_ICONS_CDN = "https://unpkg.com/@lobehub/icons-static-svg@latest/icons
  * @returns CDN URL for the icon
  */
 function getLobeIconUrl(iconName: string, colored: boolean = true): string {
-  const suffix = colored ? "-color" : "";
-  return `${LOBE_ICONS_CDN}/${iconName}${suffix}.svg`;
+  return `${LOBE_ICONS_CDN}/${iconName}${colored ? "-color" : ""}.svg`;
 }
 
 /**

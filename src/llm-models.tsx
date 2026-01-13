@@ -1,10 +1,10 @@
-import { ActionPanel, Action, Icon, List, showToast, Toast } from "@raycast/api";
+import { Icon, List, showToast, Toast } from "@raycast/api";
 import { useCachedState } from "@raycast/utils";
 import { ModelListItem } from "./types";
 import { useModels } from "./utils/use-models";
 import { getOrganizationLogo } from "./utils/organization-logos";
-import { ModelDetailForm } from "./components/views/ModelDetailForm";
-import { ModelDetailsLinkAction } from "./components/actions/ModelDetailsLinkAction";
+import { ModelActions } from "./components/actions/ModelActions";
+import { formatParamCount, formatContextSize, formatPriceFromString } from "./utils/formatting";
 
 type SortCriteria = "input-price" | "output-price" | "context-window" | "throughput" | "params";
 
@@ -125,21 +125,7 @@ export default function Command() {
               subtitle={model.organization}
               keywords={[model.organization]}
               accessories={accessories}
-              actions={
-                <ActionPanel>
-                  <Action.Push
-                    title="Show Details"
-                    target={<ModelDetailForm modelId={model.model_id} />}
-                    icon={Icon.Info}
-                  />
-                  <ModelDetailsLinkAction modelId={model.model_id} />
-                  <Action.CopyToClipboard
-                    title="Copy Model Name"
-                    content={model.name}
-                    shortcut={{ modifiers: ["cmd"], key: "c" }}
-                  />
-                </ActionPanel>
-              }
+              actions={<ModelActions modelId={model.model_id} modelName={model.name} />}
             />
           );
         })
@@ -216,43 +202,3 @@ function parseThroughput(throughputStr: string): number | null {
   return parseFloat(match[1]);
 }
 
-/**
- * Formats parameter count (e.g., 7000000000 -> "7.0B")
- */
-function formatParamCount(count: number): string {
-  if (count >= 1_000_000_000) {
-    return `${(count / 1_000_000_000).toFixed(1)}B`;
-  }
-  if (count >= 1_000_000) {
-    return `${(count / 1_000_000).toFixed(1)}M`;
-  }
-  if (count >= 1_000) {
-    return `${(count / 1_000).toFixed(1)}K`;
-  }
-  return count.toString();
-}
-
-/**
- * Formats context size (e.g., 128000 -> "128.0K tokens")
- */
-function formatContextSize(tokens: number): string {
-  if (tokens >= 1_000_000) {
-    return `${(tokens / 1_000_000).toFixed(1)}M`;
-  }
-  if (tokens >= 1_000) {
-    return `${(tokens / 1_000).toFixed(1)}K`;
-  }
-  return `${tokens} tokens`;
-}
-
-/**
- * Formats price from string (e.g., "$0.50/1M tokens" -> "$0.50/1M tokens" with proper formatting)
- * Parses the price value and formats it with toFixed(2) like in ModelDetailForm
- */
-function formatPriceFromString(priceStr: string): string {
-  const price = parsePrice(priceStr);
-  if (price === null) {
-    return priceStr; // Return original if parsing fails
-  }
-  return `$${price.toFixed(2)}/1M`;
-}
