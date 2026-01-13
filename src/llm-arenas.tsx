@@ -100,7 +100,7 @@ export default function Command() {
                 },
                 createScoreAccessory(model, index),
               ]}
-              actions={<ModelActions modelId={model.model_id} modelName={cachedModel?.name || model.model_name} />}
+              actions={<ModelActions modelId={model.model_id} />}
             />
           );
         })

@@ -153,9 +153,17 @@ export default function Command() {
                   icon={getOrganizationLogo(cachedModel?.organization_id || model.organization_name.toLowerCase())}
                   title={cachedModel?.name || model.model_name}
                   subtitle={cachedModel?.organization || model.organization_name}
-                  keywords={[cachedModel?.organization || model.organization_name, benchmark.name]}
+                  keywords={
+                    [
+                      model.model_id,
+                      model.organization_name,
+                      cachedModel?.organization_id,
+                      benchmark.name,
+                      benchmark.benchmark_id,
+                    ].filter(Boolean) as string[]
+                  }
                   accessories={accessories}
-                  actions={<ModelActions modelId={model.model_id} modelName={cachedModel?.name || model.model_name} />}
+                  actions={<ModelActions modelId={model.model_id} />}
                 />
               );
             })}

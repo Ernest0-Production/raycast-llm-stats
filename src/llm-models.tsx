@@ -118,9 +118,9 @@ export default function Command() {
               icon={getOrganizationLogo(model.organization_id)}
               title={model.name}
               subtitle={model.organization}
-              keywords={[model.organization]}
+              keywords={[model.organization_id, model.organization, model.model_id].filter(Boolean) as string[]}
               accessories={accessories}
-              actions={<ModelActions modelId={model.model_id} modelName={model.name} />}
+              actions={<ModelActions modelId={model.model_id} />}
             />
           );
         })
