@@ -45,6 +45,8 @@ export const ORGANIZATION_LOGOS: Record<string, Image.Source> = {
   amazon: getLobeIconUrl("nova"),
   baidu: getLobeIconUrl("baidu", false),
   xiaomi: getLobeIconUrl("xiaomimimo", false),
+  cohere: getLobeIconUrl("cohere"),
+  ai21: getLobeIconUrl("ai21", false),
 };
 
 /**
