@@ -1,5 +1,5 @@
-import { Icon, List, showToast, Toast, Color, ActionPanel } from "@raycast/api";
-import { useCachedPromise, useCachedState } from "@raycast/utils";
+import { Icon, List, Color, ActionPanel } from "@raycast/api";
+import { useCachedPromise, useCachedState, showFailureToast } from "@raycast/utils";
 import { useEffect } from "react";
 import { ZeroEvalAPI } from "./utils/zeroeval-api";
 import { getOrganizationLogo } from "./utils/organization-logos";
@@ -27,11 +27,7 @@ export default function Command() {
     error: categoriesError,
   } = useCachedPromise(async () => api.getCategories(), [], {
     onError: (error) => {
-      showToast({
-        style: Toast.Style.Failure,
-        title: "Failed to load categories",
-        message: error instanceof Error ? error.message : "Unknown error",
-      });
+      showFailureToast(error, { title: "Failed to load categories" });
     },
   });
 
@@ -43,27 +39,12 @@ export default function Command() {
   } = useCachedPromise(
     async (categoryId: string | undefined) => {
       if (!categoryId) return null;
-
-      try {
-        return await api.getCategoryBenchmarks(categoryId);
-      } catch (error) {
-        console.error(`Failed to load benchmarks for category ${categoryId}:`, error);
-        showToast({
-          style: Toast.Style.Failure,
-          title: "Failed to load benchmarks",
-          message: error instanceof Error ? error.message : "Unknown error",
-        });
-        return null;
-      }
+      return await api.getCategoryBenchmarks(categoryId);
     },
     [selectedCategoryId],
     {
       onError: (error) => {
-        showToast({
-          style: Toast.Style.Failure,
-          title: "Failed to load benchmarks",
-          message: error instanceof Error ? error.message : "Unknown error",
-        });
+        showFailureToast(error, { title: "Failed to load benchmarks" });
       },
     },
   );
