@@ -81,11 +81,11 @@ export default function Command() {
         </List.Dropdown>
       }
     >
-      {models.length === 0 && !isLoading ? (
+      {isLoading ? (
+        <></>
+      ) : (models.length === 0 ? (
         <List.EmptyView
-          icon={Icon.MagnifyingGlass}
-          title="No models found"
-          description="Try selecting a different arena"
+          title="No models available for this arena"
         />
       ) : (
         <>
@@ -131,7 +131,7 @@ export default function Command() {
             })}
           </List.Section>
         </>
-      )}
+      ))}
     </List>
   );
 }

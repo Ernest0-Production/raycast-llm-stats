@@ -118,13 +118,11 @@ export default function Command() {
     >
       {!selectedCategoryId ? (
         <List.EmptyView
-          icon={Icon.MagnifyingGlass}
           title="Select a category"
           description="Choose a category from the dropdown to view benchmarks"
         />
       ) : categoryData && categoryData.benchmarks.length === 0 && !isLoading ? (
         <List.EmptyView
-          icon={Icon.MagnifyingGlass}
           title="No models found"
           description="No models available for benchmarks in this category"
         />
@@ -137,17 +135,17 @@ export default function Command() {
               const accessories: List.Item.Accessory[] = [
                 index === 0
                   ? {
-                      tag: {
-                        value: formatBenchmarkScore(model.benchmark_score, benchmark.max_score),
-                        color: Color.Yellow,
-                      },
-                      icon: Icon.Trophy,
-                      tooltip: benchmark.description || benchmark.name,
-                    }
-                  : {
-                      text: formatBenchmarkScore(model.benchmark_score, benchmark.max_score),
-                      tooltip: benchmark.description || benchmark.name,
+                    tag: {
+                      value: formatBenchmarkScore(model.benchmark_score, benchmark.max_score),
+                      color: Color.Yellow,
                     },
+                    icon: Icon.Trophy,
+                    tooltip: benchmark.description || benchmark.name,
+                  }
+                  : {
+                    text: formatBenchmarkScore(model.benchmark_score, benchmark.max_score),
+                    tooltip: benchmark.description || benchmark.name,
+                  },
               ];
 
               return (
@@ -193,8 +191,8 @@ export default function Command() {
 function formatBenchmarkScore(score: number, maxScore: number): string {
   if (maxScore === 1) {
     // Percentage format for max_score = 1
-    return `${(score * 100).toFixed(2)}%`;
+    return `${Number((score * 100).toFixed(2))}%`;
   }
-  // Integer format for larger values
-  return score.toFixed(2);
+  // Integer format for larger values - trim trailing zeros
+  return Number(score.toFixed(2)).toString();
 }
