@@ -24,21 +24,21 @@ export default function Command() {
   // Sort models based on selected criteria
   const sortedModels = models
     ? [...models].sort((a, b) => {
-      switch (sortBy) {
-        case "input-price":
-          return comparePrices(a.price_per_input_token, b.price_per_input_token);
-        case "output-price":
-          return comparePrices(a.price_per_output_token, b.price_per_output_token);
-        case "context-window":
-          return compareNumbers(a.context, b.context, true); // descending
-        case "throughput":
-          return compareThroughput(a.throughput, b.throughput);
-        case "params":
-          return compareNumbers(a.params, b.params, true); // descending
-        default:
-          return 0;
-      }
-    })
+        switch (sortBy) {
+          case "input-price":
+            return comparePrices(a.price_per_input_token, b.price_per_input_token);
+          case "output-price":
+            return comparePrices(a.price_per_output_token, b.price_per_output_token);
+          case "context-window":
+            return compareNumbers(a.context, b.context, true); // descending
+          case "throughput":
+            return compareThroughput(a.throughput, b.throughput);
+          case "params":
+            return compareNumbers(a.params, b.params, true); // descending
+          default:
+            return 0;
+        }
+      })
     : [];
 
   return (

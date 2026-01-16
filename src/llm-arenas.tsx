@@ -79,10 +79,8 @@ export default function Command() {
     >
       {isLoading ? (
         <></>
-      ) : (models.length === 0 ? (
-        <List.EmptyView
-          title="No models available for this arena"
-        />
+      ) : models.length === 0 ? (
+        <List.EmptyView title="No models available for this arena" />
       ) : (
         <>
           <List.Section>
@@ -127,7 +125,7 @@ export default function Command() {
             })}
           </List.Section>
         </>
-      ))}
+      )}
     </List>
   );
 }

@@ -103,10 +103,7 @@ export default function Command() {
           description="Choose a category from the dropdown to view benchmarks"
         />
       ) : categoryData && categoryData.benchmarks.length === 0 && !isLoading ? (
-        <List.EmptyView
-          title="No models found"
-          description="No models available for benchmarks in this category"
-        />
+        <List.EmptyView title="No models found" description="No models available for benchmarks in this category" />
       ) : (
         categoryData?.benchmarks.map((benchmark) => (
           <List.Section key={benchmark.benchmark_id} title={benchmark.name}>
@@ -116,17 +113,17 @@ export default function Command() {
               const accessories: List.Item.Accessory[] = [
                 index === 0
                   ? {
-                    tag: {
-                      value: formatBenchmarkScore(model.benchmark_score, benchmark.max_score),
-                      color: Color.Yellow,
-                    },
-                    icon: Icon.Trophy,
-                    tooltip: benchmark.description || benchmark.name,
-                  }
+                      tag: {
+                        value: formatBenchmarkScore(model.benchmark_score, benchmark.max_score),
+                        color: Color.Yellow,
+                      },
+                      icon: Icon.Trophy,
+                      tooltip: benchmark.description || benchmark.name,
+                    }
                   : {
-                    text: formatBenchmarkScore(model.benchmark_score, benchmark.max_score),
-                    tooltip: benchmark.description || benchmark.name,
-                  },
+                      text: formatBenchmarkScore(model.benchmark_score, benchmark.max_score),
+                      tooltip: benchmark.description || benchmark.name,
+                    },
               ];
 
               return (

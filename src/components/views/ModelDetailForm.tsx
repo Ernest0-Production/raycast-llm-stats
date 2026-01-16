@@ -5,13 +5,9 @@ import { ORGANIZATION_LOGOS } from "../../utils/organization-logos";
 import { CompareWithSubmenu, ModelDetailsLinkAction, OpenPlaygroundAction } from "../actions/ModelActions";
 import { formatParamCount, formatContextSize, formatPrice } from "../../utils/formatting";
 
-interface ModelDetailFormProps {
-  modelId: string;
-}
-
 const api = new ZeroEvalAPI();
 
-export function ModelDetailForm({ modelId }: ModelDetailFormProps) {
+export function ModelDetailForm({ modelId }: { modelId: string }) {
   const {
     data: modelInfo,
     isLoading,
